@@ -7,11 +7,12 @@ import { registerListRepositoriesTool } from './tools/list-repositories.js';
 import { registerCreateIssueTool } from './tools/create-issue.js';
 import { registerListIssuesTool } from './tools/list-issues.js';
 import { registerCreateCommitTool } from './tools/create-commit.js';
+import { logger } from './utils/logging.js';
 
 const token = process.env.GITHUB_TOKEN;
 
 if (!token) {
-  console.error('[FATAL] GITHUB_TOKEN no está configurado. Copiá .env.example a .env y completá el token.');
+  logger.error('GITHUB_TOKEN no está configurado. Copiá .env.example a .env y completá el token.');
   process.exit(1);
 }
 
@@ -31,10 +32,10 @@ registerCreateCommitTool(server, octokit);
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('[INFO] github-mcp-agent MCP Server corriendo por stdio (5 tools registradas).');
+  logger.info('github-mcp-agent MCP Server corriendo por stdio (5 tools registradas).');
 }
 
 main().catch((err) => {
-  console.error('[FATAL] Error al iniciar el servidor MCP:', err);
+  logger.error('Error al iniciar el servidor MCP', { error: err instanceof Error ? err.message : err });
   process.exit(1);
 });

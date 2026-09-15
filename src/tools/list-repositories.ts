@@ -2,7 +2,9 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Octokit } from '@octokit/rest';
 import { ListRepositoriesSchema } from '../schemas/index.js';
 import { listRepositories } from '../github/operations.js';
-import { mapGitHubError } from '../errors/index.js';
+import { formatToolError } from '../errors/index.js';
+import { withExponentialBackoff } from '../utils/retry.js';
+import { logger } from '../utils/logging.js';
 
 export function registerListRepositoriesTool(server: McpServer, octokit: Octokit) {
   server.registerTool(
@@ -15,9 +17,9 @@ export function registerListRepositoriesTool(server: McpServer, octokit: Octokit
       inputSchema: ListRepositoriesSchema.shape,
     },
     async (input) => {
-      console.error('[DEBUG] list_repositories request:', input);
+      logger.debug('list_repositories request', { input });
       try {
-        const repos = await listRepositories(octokit, input);
+        const repos = await withExponentialBackoff(() => listRepositories(octokit, input));
         if (repos.length === 0) {
           return { content: [{ type: 'text', text: 'No se encontraron repositorios con esos filtros.' }] };
         }
@@ -26,10 +28,11 @@ export function registerListRepositoriesTool(server: McpServer, octokit: Octokit
         );
         return { content: [{ type: 'text', text: lines.join('\n') }] };
       } catch (err) {
-        const mapped = mapGitHubError(err);
+        const error = formatToolError(err, { tool: 'list_repositories', input });
+        logger.error('list_repositories failed', { error });
         return {
           isError: true,
-          content: [{ type: 'text', text: `[${mapped.code}] ${mapped.message}` }],
+          content: [{ type: 'text', text: `[${error.code}] ${error.message}` }],
         };
       }
     },

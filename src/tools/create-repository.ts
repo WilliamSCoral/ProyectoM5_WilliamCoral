@@ -2,7 +2,9 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Octokit } from '@octokit/rest';
 import { CreateRepositorySchema } from '../schemas/index.js';
 import { createRepository } from '../github/operations.js';
-import { mapGitHubError } from '../errors/index.js';
+import { formatToolError } from '../errors/index.js';
+import { withExponentialBackoff } from '../utils/retry.js';
+import { logger } from '../utils/logging.js';
 
 export function registerCreateRepositoryTool(server: McpServer, octokit: Octokit) {
   server.registerTool(
@@ -15,9 +17,9 @@ export function registerCreateRepositoryTool(server: McpServer, octokit: Octokit
       inputSchema: CreateRepositorySchema.shape,
     },
     async (input) => {
-      console.error('[DEBUG] create_repository request:', input);
+      logger.debug('create_repository request', { input });
       try {
-        const repo = await createRepository(octokit, input);
+        const repo = await withExponentialBackoff(() => createRepository(octokit, input));
         return {
           content: [
             {
@@ -27,10 +29,11 @@ export function registerCreateRepositoryTool(server: McpServer, octokit: Octokit
           ],
         };
       } catch (err) {
-        const mapped = mapGitHubError(err);
+        const error = formatToolError(err, { tool: 'create_repository', input });
+        logger.error('create_repository failed', { error });
         return {
           isError: true,
-          content: [{ type: 'text', text: `[${mapped.code}] ${mapped.message}` }],
+          content: [{ type: 'text', text: `[${error.code}] ${error.message}` }],
         };
       }
     },
