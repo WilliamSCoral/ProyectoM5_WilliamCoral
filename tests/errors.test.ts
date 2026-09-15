@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { RequestError } from '@octokit/request-error';
-import { ZodError, z } from 'zod';
+import type { RequestErrorOptions } from '@octokit/request-error';
+import { z } from 'zod';
 import {
   translateError,
   formatToolError,
@@ -22,7 +23,7 @@ function makeRequestError(
       headers: opts.headers ?? {},
       data: opts.data ?? {},
     },
-  } as any);
+  } as unknown as RequestErrorOptions);
 }
 
 describe('translateError', () => {
