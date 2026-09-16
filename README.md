@@ -180,6 +180,8 @@ Estos tres prompts fueron probados en vivo desde Antigravity (evidencia en [`doc
 | "Creá un issue en el repo ProyectoM5_WilliamCoral con el título 'Test de integración desde Antigravity'" | `create_issue` | Issue #1 creado |
 | "Creá un archivo llamado evidencia.md en el repo ProyectoM5_WilliamCoral con el contenido 'Prueba desde Antigravity'" | `create_commit` | Commit real en `main` |
 
+> ⚠️ **Alcance de las pruebas en vivo**: si vas a probar `create_issue`, `create_commit` o `create_repository` contra una cuenta real de GitHub, hacelo **únicamente sobre el repositorio `ProyectoM5_WilliamCoral`** (este mismo proyecto). No apuntes esas tools a otros repositorios de la cuenta, ya que pueden contener información sensible no relacionada con esta demo.
+
 ## Testing
 
 ```bash
