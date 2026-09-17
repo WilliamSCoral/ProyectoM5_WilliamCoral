@@ -1,3 +1,8 @@
+/**
+ * Registra la tool list_issues. Mismo patrón que list-repositories.ts
+ * (chequeo de lista vacía); cada línea del resultado incluye el estado
+ * entre corchetes (ej: [open]).
+ */
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Octokit } from '@octokit/rest';
 import { ListIssuesSchema } from '../schemas/index.js';

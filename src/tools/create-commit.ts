@@ -1,3 +1,9 @@
+/**
+ * Registra la tool create_commit. Mismo patrón que create-repository.ts;
+ * delega toda la complejidad del flujo de 6 pasos de Git a
+ * createCommitWithFile (src/github/operations.ts). El texto de éxito
+ * incluye la rama además del SHA y la URL del commit.
+ */
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Octokit } from '@octokit/rest';
 import { CreateCommitSchema } from '../schemas/index.js';

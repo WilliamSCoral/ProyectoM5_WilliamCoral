@@ -1,3 +1,8 @@
+/**
+ * Registra la tool list_repositories. Mismo patrón que create-repository.ts;
+ * la diferencia propia acá es el manejo de "lista vacía" antes de armar el
+ * texto de respuesta.
+ */
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Octokit } from '@octokit/rest';
 import { ListRepositoriesSchema } from '../schemas/index.js';
@@ -20,9 +25,11 @@ export function registerListRepositoriesTool(server: McpServer, octokit: Octokit
       logger.debug('list_repositories request', { input });
       try {
         const repos = await withExponentialBackoff(() => listRepositories(octokit, input));
+        // Mensaje distinto si no hay resultados, en vez de devolver texto vacío confuso.
         if (repos.length === 0) {
           return { content: [{ type: 'text', text: 'No se encontraron repositorios con esos filtros.' }] };
         }
+        // Un repo por línea: "- fullName (visibilidad) -> url".
         const lines = repos.map(
           (r) => `- ${r.fullName} (${r.private ? 'privado' : 'público'}) -> ${r.htmlUrl}`,
         );

@@ -1,3 +1,8 @@
+/**
+ * Registra la tool create_issue. Mismo patrón que create-repository.ts;
+ * la diferencia propia es el texto de éxito, que incluye el número del
+ * issue (ej: #42) y su título.
+ */
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Octokit } from '@octokit/rest';
 import { CreateIssueSchema } from '../schemas/index.js';
